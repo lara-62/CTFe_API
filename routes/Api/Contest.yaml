@@ -1,0 +1,571 @@
+# openapi: '3.0.0'
+# info: 
+#   title: 'CTFe API'
+#   version: '1.0.0'
+#   description: 'A web security challenge platform api'
+# servers: 
+#   -url: 'http://localhost:3000'
+#   description: 'Development server'
+
+
+tags:
+      name: Contest
+
+paths:
+  /contest:
+      get:
+        tags:
+        - "Contest"
+        summary: "Get Contests of this site"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "status"
+          in: "query"
+          description: "status of the contest"
+          type: "array"
+          content:
+               text/plain:
+                  schema:
+                    type: array
+                    items:
+                       type: "string"
+                       enum:
+                       - "all"
+                       - "past"
+                       - "running"
+                       - "upcoming"
+                       default: "all"
+          collectionFormat: "multi"
+        - name: "type"
+          in: "query"
+          description: "type of the contest"
+          type: "array"
+          content:
+               text/plain:
+                  schema:
+                    type: "array"
+                    items:
+                       type: "string"
+                       enum:
+                       - "all"
+                       - "private"
+                       - "offcial"
+                       - "myparticipated"
+                       - "my organized"
+                       default: "all"
+          collectionFormat: "multi"
+        responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         $ref: '#/components/schemas/Contests'  
+            404:
+             description: "Catagory not found"
+  /contest/{contestId}:
+     get:
+        tags:
+        - "Contest"
+        summary: "Returns a specific contest details"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "contestId"
+          in: "path"
+          description: "contestId of the contest to get"
+          required: true
+          type: "string"
+        responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         $ref: '#/components/schemas/Contest'
+            400:
+             description: "Invalid contestid supplied"
+            404:
+             description: "No contest with this id"
+  /contest/{contestId}/Enter:   #I have to think about it more
+       get:
+          tags:
+          - "Contest"
+          summary: "Enter to the contest"
+          produces:
+          - "application/json"
+          parameters:
+          - name: "contestId"
+            in: "path"
+            description: "contestId of the contest to Enter"
+            required: true
+            type: "string"
+          - name: "type"
+            in: "query"    
+            description: "type of the contest"
+            required: true
+            content:
+              text/plain:
+               schema:
+                  type: "string"
+                  enum:
+                  - "live"
+                  - "virtual"
+          responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"     
+  /contest/{contestId}/Register:
+       post:
+            tags:
+            - "Contest"
+            summary: "Register to the contest"
+            produces:
+            - "application/json"
+            parameters:
+            - name: "contestId"
+              in: "path"
+              description: "contestId of the contest to Register"
+              required: true
+              type: "string"
+            - name : "body"
+              in: "body"
+              description: "body of the request"
+              required: true
+              schema:
+                type: object
+                properties:
+                  teamname:
+                    type: string
+                    example: "Potato Hackers"
+                  teamPassword:
+                    type: string
+                    example: "123456"
+                  teamMembers:
+                    type: array
+                    items:
+                      type: string
+                      example: "lara62"
+            responses:
+               200:
+                 description: "successful"
+                 content:
+                     application/json:
+                        schema:
+                           type: object
+                           properties:
+                              teamId:
+                                 type: string
+                                 example: "Potato Hackers"
+                              teamPassword:
+                                 type: string
+                                 example: "123456"
+               400:
+                  description: "Invalid contestid supplied"
+               404:
+                  description: "No contest with this id"
+        
+  /contest/{contestId}/Challenges:
+       get:
+          tags:
+          - "Contest"
+          summary: "Returns all the problems of the contest"
+          produces:
+          - "application/json"
+          parameters:
+          - name: "contestId"            
+            in: "path"
+            description: "contestId of the contest"
+            required: true
+            type: "string"
+          responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"                  
+  /contest/{contestId}/Challenges/{problemId}:
+       get:
+          tags:
+          - "Contest"
+          summary: "Returns a specific problem of the contest"
+          produces:
+          - "application/json"
+          parameters:
+          - name: "contestId"            
+            in: "path"
+            description: "contestId of the contest"
+            required: true
+            type: "string"
+          - name: "problemId"            
+            in: "path"
+            description: "problemId of the problem"
+            required: true
+            type: "string"
+          responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid problemid supplied"
+            404:
+               description: "No problem with this id"
+  /contest/{contestId}/Challenges/{problemId}/Submit:
+       post:
+          tags:
+          - "Contest"
+          summary: "Submit a flag for a specific problem of the contest"
+          produces:
+          - "application/json"
+          parameters:
+          - name: "contestId"            
+            in: "path"
+            description: "contestId of the contest"
+            required: true
+            type: "string"
+          - name: "problemId"            
+            in: "path"
+            description: "problemId of the problem"
+            required: true
+            type: "string"
+          - name: "flag"            
+            in: "body"
+            description: "flag of the problem"
+            required: true
+            type: "string"
+            example: "ctfe{test}"
+          responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         properties:
+                            verdict:
+                               type: "string"
+                               enum:
+                               - "matched"
+                               - "not matched"
+                            attempts:
+                               type: "integer"
+                               format: "int32"
+                               example: 1
+                            remaining_attempts:
+                               type: "integer"
+                               format: "int32"
+                               example: 2
+                            score:
+                               type: "integer"
+                               format: "int32"
+                               example: 100
+            400:
+               description: "Invalid problemid supplied"
+            404:
+               description: "No problem with this id"
+  /contest/{contestId}/Challenges/{problemId}/UnlockHint:
+      get:
+         tags:
+         - "Contest"
+         summary: "Unlock a hint for a specific problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "problemId"            
+           in: "path"
+           description: "problemId of the problem"
+           required: true
+           type: "string"
+         - name: "Hintnum"            
+           in: "query"
+           description: "Hint number you want to unlock"
+           required: true
+           type: "integer"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        properties:
+                           hint:
+                              type: "string"
+                              example: "you can use burp suite"
+                           pointLost:
+                              type: "integer"
+                              format: "int32"
+                              example: 100
+            400:
+               description: "Invalid problemid supplied"
+            404:
+               description: "Hint number not found"
+
+  /contest/{contestId}/Standings:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the standings of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+  /contest/{contestId}/Clarifications:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the clarifications of the question of the contestants"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "catagory"
+           in: "query"
+           description: "catagory of the clarification"
+           type: "string"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+
+  /contest/{contestId}/ Clarifications/question:
+      post:
+         tags:
+         - "Contest"
+         summary: "Ask a question about any problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "question"            
+           in: "body"
+           description: "question of the problem"
+           required: true
+           type: "string"
+           example: "i think there is a missing information in the ques?"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+  /contest/{contestId}/Announcements:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the announcements of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+
+  /contest/{contestId}/{teamId}:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the details of the team participating in the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "teamId"            
+           in: "path"
+           description: "teamId of the team"
+           required: true
+           type: "string"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+  
+  /contest/{contestId}/{teamId}/{userId}:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the detail contribution of a user of the team participating in the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "teamId"            
+           in: "path"
+           description: "teamId of the team"
+           required: true
+           type: "string"
+         - name: "userId"            
+           in: "path"
+           description: "userId of the user"
+           required: true
+           type: "string"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/User'
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+
+components:
+   schemas:
+      Contests:
+        type: array
+        items:
+            type: object
+            properties:
+               status: 
+                  type: "string"
+                  example: current contests
+               contests: 
+                  type: array
+                  items:
+                     type: object
+                     properties:
+                        contestname:
+                           type: string
+                           example: CTFBD
+                        Date :
+                           type: string
+                           example: 19 DEC, 2023
+                        Duration: 
+                           type: string
+                           example: 03:00:00
+      Contest:
+         type: object
+         properties:
+            contestname:
+               type: string
+               example: CTFBD
+            Start time :
+               type: string
+               example: Sun, 17 Dec. 2023, 11:30 UTC
+            End time:
+               type: string
+               example:  Tue, 19 Dec. 2023, 11:30 UTC
+            Format: 
+               type: string
+               example: Jeopardy
+            Event organizers:
+               type: array
+               items:
+                  type: string
+                  example: CIBERDRILL
+            description:
+               type: string
+               example: CTFBD is a jeopardy style CTF for students interested in cybersecurity. 
+                        CTFBD is designed to help students explore newer domains in 
+                        cybersecurity as well as help existing professionals practise their 
+                        skills. We will feature challenges which cover various domains of 
+                        cybersecurity including cryptography, reversing, forensics, web 
+                        exploitation, pwn and more
+            Prize :
+               type: string
+               example: T shirt for top 5 teams
+            Rules :
+               type: string
+               example: The following rules will be strictly follwet
+                        1.FLAG SHARING is strongly prohibited, any team doing so will be 
+                        banned from the contest right away.
+                        2.There will be max 10 attempts for each problem.
+                        3.Credentials will be send to teams via email.
+                        4.Join our discord server to get any kind of technical help
+            number of Registered Team:
+               type: "integer"
+               example: 129
+            Registered Teams:
+               type: array
+               items:
+                  type: string
+                  example: Potato Hackers
+
+
+   
+
+
