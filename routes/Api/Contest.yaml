@@ -55,6 +55,10 @@ paths:
                        - "my organized"
                        default: "all"
           collectionFormat: "multi"
+        - name : "Search_text"
+          in: "query"
+          description: "search contest by name"
+          type: "string"
         responses:
             200:
               description: "successful"
@@ -88,41 +92,1481 @@ paths:
              description: "Invalid contestid supplied"
             404:
              description: "No contest with this id"
-  /contest/{contestId}/Enter:   #I have to think about it more
-       get:
-          tags:
-          - "Contest"
-          summary: "Enter to the contest"
-          produces:
-          - "application/json"
-          parameters:
-          - name: "contestId"
-            in: "path"
-            description: "contestId of the contest to Enter"
-            required: true
-            type: "string"
-          - name: "type"
-            in: "query"    
-            description: "type of the contest"
-            required: true
-            content:
-              text/plain:
-               schema:
-                  type: "string"
-                  enum:
-                  - "live"
-                  - "virtual"
-          responses:
+     delete:
+         tags:
+         - "Contest"
+         summary: "Delete a specific contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to delete"
+           required: true
+           type: "string"
+         - name: "password"
+           in: "body"
+           description: "password of your account"
+           required: true
+           type: "string"
+         responses:
+               200:
+                  description: "successful"
+                  content:
+                     application/json:
+                           schema:
+                              type: string
+                              example: "contest deleted successfully"
+               401:
+                  description: "Unauthorized contest id supplied"
+               400:
+                  description: "Invalid contestid supplied"
+               404:
+                  description: "No contest with this id"
+  /contest/create:
+      post:
+         tags:
+         - "Contest"
+         summary: "Create a contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name : "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  contestname:
+                     type: string
+                     example: "CTFBD"
+                  contestType:
+                     type: string
+                     example: "private"
+         responses:
+               200:
+                  description: "successful"
+                  content:
+                     application/json:
+                           schema:
+                              type: object
+                              properties:
+                                 contestId:
+                                    type: string
+                                    example: "CTFBD"
+               401:
+                  description: "Unauthorized contest type"
+  
+  /contest/Edit/{contestId}/Config:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the config of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get config"
+           required: true
+           type: "string"
+         responses:
             200:
-              description: "successful"
-              content:
-                 application/json:
-                      schema:
-                         $ref: '#/components/schemas/User'
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/Contest'
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+      patch:
+         tags:
+         - "Contest"
+         summary: "Update a contest config"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to update"
+           required: true
+           type: "string"
+         - name : "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  contestname:
+                     type: string
+                     example: "CTFBD"
+                     optional: true
+                  CreatedBy:
+                     type: string
+                     example: "Zero66"
+                     optional: true
+                  contestType:
+                     type: string
+                     example: "private"
+                     optional: true
+                  BeginTime:
+                     type: string
+                     example: "2023-12-17T11:30:00.000Z"
+                     optional: true
+                  EndTime:
+                     type: string
+                     example: "2023-12-19T11:30:00.000Z"
+                     optional: true
+                  MinMember:
+                     type: "integer"
+                     format: "int32"
+                     example: 1
+                     optional: true
+                  MaxMember:
+                     type: "integer"
+                     format: "int32"
+                     example: 4
+                     optional: true
+                  password :
+                     type: string
+                     example: "123456"
+                     optional: true
+                  Collaborators:
+                     type: array
+                     items:
+                        type: string
+                        example: "Zero66"
+                     optional: true
+         responses:
+               200:
+                  description: "successful"
+                  content:
+                     application/json:
+                           schema:
+                              type: object
+                              properties:
+                                 contestId:
+                                    type: string
+                                    example: "CTFBD"
+               401:
+                  description: "Unauthorized contest id supplied"
+               400:
+                description: "Invalid contestid supplied"
+               404:
+                description: "No contest with this id"
+
+  /contest/Edit/{contestId}/Description:
+       get:
+         tags:
+         - "Contest"
+         summary: "Returns the description of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get description"
+           required: true
+           type: "string"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/Contest'
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+       post: 
+         tags:
+         - "Contest"
+         summary: "Add a section in the description to the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to add description"
+           required: true
+           type: "string"
+         - name : "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  title:
+                     type: string
+                     example: "Rules"
+                  sectionbody:
+                     type: string
+                     example: "The following rules will be strictly follwet
+                               1.FLAG SHARING is strongly prohibited, any team doing so will be 
+                               banned from the contest right away.
+                               2.There will be max 10 attempts for each problem.
+                               3.Credentials will be send to teams via email.
+                               4.Join our discord server to get any kind of technical help"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           sectionId:
+                              type: "integer"
+                              example: "1"
+            401:
+               description: "Unauthorized contest id supplied"
             400:
                description: "Invalid contestid supplied"
             404:
+               description: "No contest with this id"
+       put:
+         tags:
+         - "Contest"
+         summary: "Update a section in the description to the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to update description"
+           required: true
+           type: "string"
+         - name: "sectionId"
+           in: "query"
+           description: "sectionId of the section to update"
+           required: true
+           type: "integer"
+         - name : "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  title:
+                     type: string
+                     example: "Rules"
+                  sectionbody:
+                     type: string
+                     example: "The following rules will be strictly follwet
+                               1.FLAG SHARING is strongly prohibited, any team doing so will be 
+                               banned from the contest right away.
+                               2.There will be max 10 attempts for each problem.
+                               3.Credentials will be send to teams via email.
+                               4.Join our discord server to get any kind of technical help"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           sectionId:
+                              type: "integer"
+                              example: "1"
+            401:
+               description: "Unauthorized contest id supplied"
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+       delete:
+         tags:
+         - "Contest"
+         summary: "Delete a section in the description to the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to delete description"
+           required: true
+           type: "string"
+         - name: "sectionId"
+           in: "query"
+           description: "sectionId of the section to delete"
+           required: true
+           type: "integer"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           sectionId:
+                              type: "integer"
+                              example: "1"
+            401:
+               description: "Unauthorized contest id supplied"
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+  /contest/Edit/{contestId}/Announcements:
+       get:
+         tags:
+         - "Contest"
+         summary: "Returns the announcements of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get announcements"
+           required: true
+           type: "string"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/Announcements'
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+       post:
+         tags:
+         - "Contest"
+         summary: "Add an announcement to the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest to add announcement"
+           required: true
+           type: "string"
+         - name : "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  announcement:
+                     type: string
+                     example: "Contest time has been extended by 1 hour"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           announcementId:
+                              type: "integer"
+                              example: "1"
+            401:
+               description: "Unauthorized contest id supplied"
+            400:
+               description: "Invalid contestid supplied"
+            404:
+               description: "No contest with this id"
+  /contest/Edit/{contestId}/ Clarifications:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the clarification  questions of the contestants"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get clarifications"
+           required: true
+           type: "string"
+         - name : "UnansweredOnly"
+           in: "query"
+           description: "if true then return only unanswered questions"
+           type: "boolean"
+         responses:
+            200:
+             description: "successful"
+             content:
+               application/json:
+                     schema:
+                        $ref: '#/components/schemas/Clarifications'
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+      post:
+         tags:
+         - "Contest"
+         summary: "Answer a question about any problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "questionId"            
+           in: "query"
+           description: "questionId of the question"
+           required: true
+           type: "integer"
+         - name: "answer"            
+           in: "body"
+           description: "answer of the question"
+           required: true
+           type: "string"
+           example: "yes, you are right"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: string
+                        example: "your answer has been submitted"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or ques with this id"
+
+  /contest/Edit/{contestId}/Users:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the users of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get users"
+           required: true
+           type: "string"
+         - name : search_text
+           in: "query"
+           description: "search user by username"
+           type: "string"
+           optional: true
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           type: object
+                           properties:
+                              username:
+                                 type: string
+                                 example: "Zero66"
+                              score:
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 1200
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+
+  /contest/Edit/{contestId}/Teams:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the teams of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get teams"
+           required: true
+           type: "string"
+         - name : search_text
+           in: "query"
+           description: "search team by teamname"
+           type: "string"
+           optional: true
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           type: object
+                           properties:
+                              teamname:
+                                 type: string
+                                 example: "Potato Hackers"
+                              Members:
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 3
+                              Solved:
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 5
+                              Points:
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 1200
+                              Status:
+                                 type: string
+                                 example: "Banned"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+  /contest/Edit/{contestId}/Scoreboard:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the scoreboard of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get scoreboard"
+           required: true
+           type: "string"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           type: object
+                           properties:
+                              rank:
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 1
+                              teamname:
+                                 type: string
+                                 example: "Potato Hackers"
+                              Points:
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 1200
+                              Visibility:
+                                 type: "boolean"
+                                 example: true
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+  /contest/Edit/{contestId}/Scoreboard/Visibility:
+      patch:
+         tags:
+         - "Contest"
+         summary: "Update the visibility of the scoreboard of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to update scoreboard visibility"
+           required: true
+           type: "string"
+         - name: "visibility"
+           in: "query"
+           description: "visibility of the scoreboard"
+           required: true
+           type: "boolean"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           visibility:
+                              type: "boolean"
+                              example: true
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+  /contest/Edit/{contestId}/Submissions:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the submissions of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get submissions"
+           required: true
+           type: "string"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           type: object
+                           properties:
+                              username:
+                                 type: string
+                                 example: "Zero66"
+                              Teamname:
+                                 type: string
+                                 example: "Potato Hackers"
+                              problemName:
+                                 type: string
+                                 example: "Caesar Cipher"
+                              catagory:
+                                 type: string
+                                 example: "Cryptography"
+                              time:
+                                 type: string
+                                 example: "2023-12-17T11:30:00.000Z"
+                              verdict:
+                                 type: string
+                                 example: "matched"
+                              Flag:
+                                 type: string
+                                 example: "ctfe{test}"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+  /contest/Edit/{contestId}/Statistics:
+       get:
+         tags:
+         - "Contest"
+         summary: "Returns the statistics of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get statistics"
+           required: true
+           type: "string"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           TotalTeams:
+                              type: "integer"
+                              format: "int32"
+                              example: 129
+                           TotalUsers:
+                              type: "integer"
+                              format: "int32"
+                              example: 500
+                           ScoreStats:
+                              type: array
+                              items:
+                                 type: object
+                                 properties:
+                                    scoreRange:
+                                       type: string
+                                       example: "0-100"
+                                    NumberOfTeams:
+                                       type: "integer"
+                                       format: "int32"
+                                       example: 100
+                           ProblemStats:
+                              type: array
+                              items:
+                                 type: object
+                                 properties:
+                                    problemId:
+                                       type: string
+                                       example: "1"
+                                    NumberOfSolved:
+                                       type: "integer"
+                                       format: "int32"
+                                       example: 5
+                           CategoryStats:
+                              type: array
+                              items:
+                                 type: object
+                                 properties:
+                                    catagory:
+                                       type: string
+                                       example: "Cryptography"
+                                    NumberOfSolved:
+                                       type: "integer"
+                                       format: "int32"
+                                       example: 2
+                           SolvedStats:
+                              type: object
+                              properties:
+                                 solves:
+                                    type : string
+                                    example: "14(5.65%)"
+                                 Fails :
+                                    type : string
+                                    example: "234(94.35%)"
+            404:
+               description: "No contest with this id"
+
+  /contest/Edit/{contestId}/Challenges:
+      get:
+         tags:
+         - "Contest"
+         summary: "Returns the problems of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           type: object
+                           properties:
+                              problemId:
+                                 type: string
+                                 example: "Caesar Cipher"
+                              problemName:
+                                 type: string
+                                 example: "Caesar Cipher"
+                              catagory:
+                                 type: string
+                                 example: "Cryptography"
+                              Points:
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 100
+                              State:
+                                 type: string
+                                 example: "visible"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
                description: "No contest with this id"     
+
+  /contest/Edit/{contestId}/Challenge:
+      post:
+         tags:
+         - "Contest"
+         summary: "Add a new challenge to the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  problemName:
+                     type: string
+                     example: "Caesar Cipher"
+                  catagory:
+                     type: array
+                     items:
+                        type: string
+                        example: "Cryptography"
+                  Points:
+                     type: "integer"
+                     format: "int32"
+                     example: 100
+                  Max attempt: 
+                     type: "integer"
+                     format: "int32"
+                     example: 10
+                  Problem Statement:
+                     type: string
+                     example: "This is a caesar cipher problem"
+                  FileLinks:
+                     type: array
+                     items:
+                        type: string
+                        example: "https://d"
+                  Flags:
+                     type: array
+                     items:
+                        type: string
+                        example: "ctfe{test}"
+                  Hints:
+                     type: array
+                     items:
+                        type: object
+                        properties:
+                           hint:
+                              type: string
+                              example: "you can use burp suite"
+                           pointLost:
+                              type: "integer"
+                              format: "int32"
+                              example: 100
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           problemId:
+                              type: string
+                              example: "Caesar Cipher"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest with this id"
+   
+  /contest/Edit/{contestId}/{problemId}/ChangeVisibility:
+      patch:
+         tags:
+         - "Contest"
+         summary: "Change the visibility of the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"            
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "problemId"            
+           in: "path"
+           description: "problemId of the problem"
+           required: true
+           type: "string"
+         - name: "visibility"            
+           in: "query"
+           description: "visibility of the problem"
+           required: true
+           type: "boolean"
+         responses:
+            200:
+               description: "successful"
+               content:
+               application/json:
+                     schema:
+                        type: string
+                        example: "visibility changed successfully"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+  /contest/Edit/{contestId}/{problemId}/Addhint:
+      post:
+         tags:
+         - "Contest"
+         summary: "Add a hint to the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to add hint"
+           required: true
+           type: "string"
+         - name: "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  hint:
+                     type: string
+                     example: "you can use burp suite"
+                  pointLost:
+                     type: "integer"
+                     format: "int32"
+                     example: 100
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           hintId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+  /contest/Edit/{contestId}/{problemId}/hint/{hintId}:
+      delete:
+         tags:
+         - "Contest"
+         summary: "Delete a hint of a problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to delete hint"
+           required: true
+           type: "string"
+         - name: "hintId"
+           in: "path"
+           description: "hintId of the hint to delete"
+           required: true
+           type: "integer"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           hintId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id" 
+
+  /contest/Edit/{contestId}/{problemId}/Addrequirement:
+      post:
+         tags:
+         - "Contest"
+         summary: "Add a requirement to the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to add requirement"
+           required: true
+           type: "string"
+         - name: "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  requiredProblemId:
+                     type: string
+                     example: "Caesar Cipher"
+                  requiredProblemCatagory:
+                     type: string
+                     example: "Cryptography"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           requirementId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+
+  /contest/Edit/{contestId}/{problemId}/{requirementId}: 
+      delete:
+         tags:
+         - "Contest"
+         summary: "Delete a requirement of a problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to delete requirement"
+           required: true
+           type: "string"
+         - name: "requirementId"
+           in: "path"
+           description: "requirementId of the requirement to delete"
+           required: true
+           type: "integer"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           requirementId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+
+  /contest/Edit/{contestId}/{problemId}/Addvariation:
+       post:
+         tags:
+         - "Contest"
+         summary: "Add a variation to the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to add variation"
+           required: true
+           type: "string"
+         - name: "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           schema:
+               type: object
+               properties:
+                  problemName:
+                     type: string
+                     example: "Caesar Cipher"
+                  catagory:
+                     type: array
+                     items:
+                        type: string
+                        example: "Cryptography"
+                  Points:
+                     type: "integer"
+                     format: "int32"
+                     example: 100
+                  Max attempt: 
+                     type: "integer"
+                     format: "int32"
+                     example: 10
+                  Problem Statement:
+                     type: string
+                     example: "This is a caesar cipher problem"
+                  FileLinks:
+                     type: array
+                     items:
+                        type: string
+                        example: "https://d"
+                  Flags:
+                     type: array
+                     items:
+                        type: string
+                        example: "ctfe{test}"
+                  Hints:
+                     type: array
+                     items:
+                        type: object
+                        properties:
+                           hint:
+                              type: string
+                              example: "you can use burp suite"
+                           pointLost:
+                              type: "integer"
+                              format: "int32"
+                              example: 100
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           variationId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+
+  /contest/Edit/{contestId}/{problemId}/{variationId}/AddFlag:
+      post:
+         tags:
+         - "Contest"
+         summary: "Add a flag to the variation of the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to add flag"
+           required: true
+           type: "string"
+         - name: "variationId"
+           in: "path"
+           description: "variationId of the variation to add flag"
+           required: true
+           type: "integer"
+         - name: "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           type: "string"
+           example: "ctfe{test}"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           flagId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+
+  /contest/Edit/{contestId}/{problemId}/{variationId}/{FlagId}:
+      put:
+         tags:
+         - "Contest"
+         summary: "Update a flag of the variation of the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to update flag"
+           required: true
+           type: "string"
+         - name: "variationId"
+           in: "path"
+           description: "variationId of the variation to update flag"
+           required: true
+           type: "integer"
+         - name: "FlagId"
+           in: "path"
+           description: "FlagId of the flag to update"
+           required: true
+           type: "integer"
+         - name: "body"
+           in: "body"
+           description: "body of the request"
+           required: true
+           type: "string"
+           example: "ctfe{test}"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           flagId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+      delete:
+         tags:
+         - "Contest"
+         summary: "Delete a flag of the variation of the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get problems"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to delete flag"
+           required: true
+           type: "string"
+         - name: "variationId"
+           in: "path"
+           description: "variationId of the variation to delete flag"
+           required: true
+           type: "integer"
+         - name: "flagId"
+           in: "path"
+           description: "flagId of the flag to delete"
+           required: true
+           type: "integer"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           flagId:
+                              type: "integer"
+                              example: "1"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+
+  /contest/Edit/{contestId}/{problemId}/FlagMismatch:
+       get:
+         tags:
+         - "Contest"
+         summary: "Returns the flag matching list of the problem of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest to get flag mismatch"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem to get flag mismatch"
+           required: true
+           type: "string"
+         - name : "catagory"
+           in: "query"
+           description: "catagory of the problem"
+           type: "string"
+           optional: true
+         - name : "search_text"
+           in: "query"
+           description: "search flag mismatch by username"
+           type: "string"
+           optional: true
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           type: object
+                           properties:
+                              username:
+                                 type: string
+                                 example: "Zero66"
+                              Teamname:
+                                 type: string
+                                 example: "Potato Hackers"
+                              problemName:
+                                 type: string
+                                 example: "Caesar Cipher"
+                              catagory:
+                                 type: string
+                                 example: "Cryptography"
+                              time:
+                                 type: string
+                                 example: "2023-12-17T11:30:00.000Z"
+                              status:
+                                 type: string
+                                 example: "banned"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+  /contest/Edit/{contestId}/{problemId}/ChangeStatusOfTeam/{teamId}:
+      patch:
+         tags:
+         - "Contest"
+         summary: "Change the status of a team of the contest"
+         produces:
+         - "application/json"
+         parameters:
+         - name: "contestId"
+           in: "path"
+           description: "contestId of the contest"
+           required: true
+           type: "string"
+         - name: "problemId"
+           in: "path"
+           description: "problemId of the problem"
+           required: true
+           type: "string"
+         - name: "teamId"
+           in: "path"
+           description: "teamId of the team"
+           required: true
+           type: "string"
+         - name: "status"
+           in: "query"
+           description: "status of the team"
+           required: true
+           type: "string"
+           enum:
+           - "banned"
+           - "permit"
+         responses:
+            200:
+               description: "successful"
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           status:
+                              type: string
+                              example: "banned"
+            400:
+               description: "Invalid contestid supplied"
+            401:
+               description: "Unauthorized contest id supplied"
+            404:
+               description: "No contest or problem with this id"
+
+#   /contest/{contestId}/Enter:   #I have to think about it more
+#        get:
+#           tags:
+#           - "Contest"
+#           summary: "Enter to the contest"
+#           produces:
+#           - "application/json"
+#           parameters:
+#           - name: "contestId"
+#             in: "path"
+#             description: "contestId of the contest to Enter"
+#             required: true
+#             type: "string"
+#           - name: "type"
+#             in: "query"    
+#             description: "type of the contest"
+#             required: true
+#             content:
+#               text/plain:
+#                schema:
+#                   type: "string"
+#                   enum:
+#                   - "live"
+#                   - "virtual"
+#           responses:
+#             200:
+#               description: "successful"
+#               content:
+#                  application/json:
+#                       schema:
+#                          $ref: '#/components/schemas/User'
+#             400:
+#                description: "Invalid contestid supplied"
+#             404:
+#                description: "No contest with this id"     
   /contest/{contestId}/Register:
        post:
             tags:
@@ -192,7 +1636,7 @@ paths:
               content:
                  application/json:
                       schema:
-                         $ref: '#/components/schemas/User'
+                         $ref: '#/components/schemas/Challenges'
             400:
                description: "Invalid contestid supplied"
             404:
@@ -221,7 +1665,7 @@ paths:
               content:
                  application/json:
                       schema:
-                         $ref: '#/components/schemas/User'
+                         $ref: '#/components/schemas/ProblemDetails'
             400:
                description: "Invalid problemid supplied"
             404:
@@ -339,7 +1783,7 @@ paths:
              content:
                application/json:
                      schema:
-                        $ref: '#/components/schemas/User'
+                        $ref: '#/components/schemas/Standings'
             400:
                description: "Invalid contestid supplied"
             404:
@@ -361,13 +1805,17 @@ paths:
            in: "query"
            description: "catagory of the clarification"
            type: "string"
+         - name: MyquesOnly
+           in: "query"
+           description: "if true then return only my questions"
+           type: "boolean"
          responses:
             200:
              description: "successful"
              content:
                application/json:
                      schema:
-                        $ref: '#/components/schemas/User'
+                        $ref: '#/components/schemas/Clarifications'
             400:
                description: "Invalid contestid supplied"
             404:
@@ -398,11 +1846,15 @@ paths:
              content:
                application/json:
                      schema:
-                        $ref: '#/components/schemas/User'
+                        type: string
+                        example: "your question has been submitted. Author will try to answer it as soon as possible"
             400:
                description: "Invalid contestid supplied"
             404:
                description: "No contest with this id"
+
+
+
   /contest/{contestId}/Announcements:
       get:
          tags:
@@ -422,11 +1874,13 @@ paths:
              content:
                application/json:
                      schema:
-                        $ref: '#/components/schemas/User'
+                        $ref: '#/components/schemas/Announcements'
             400:
                description: "Invalid contestid supplied"
             404:
                description: "No contest with this id"
+
+
 
   /contest/{contestId}/{teamId}:
       get:
@@ -452,13 +1906,13 @@ paths:
              content:
                application/json:
                      schema:
-                        $ref: '#/components/schemas/User'
+                        $ref: '#/components/schemas/TeamPerformanceOfAContest'
             400:
                description: "Invalid contestid supplied"
             404:
                description: "No contest with this id"
   
-  /contest/{contestId}/{teamId}/{userId}:
+  /contest/{contestId}/{teamId}/{username}:
       get:
          tags:
          - "Contest"
@@ -476,9 +1930,9 @@ paths:
            description: "teamId of the team"
            required: true
            type: "string"
-         - name: "userId"            
+         - name: "username"            
            in: "path"
-           description: "userId of the user"
+           description: "username of the user"
            required: true
            type: "string"
          responses:
@@ -487,7 +1941,7 @@ paths:
              content:
                application/json:
                      schema:
-                        $ref: '#/components/schemas/User'
+                        $ref: '#/components/schemas/UserPerformanceOfAContest'
             400:
                description: "Invalid contestid supplied"
             404:
@@ -564,8 +2018,251 @@ components:
                items:
                   type: string
                   example: Potato Hackers
-
-
-   
-
-
+      Challenges:
+         type: object
+         properties:
+            ProblemLists:
+               type: array
+               items:
+                  type: object
+                  properties:
+                     "Catagory":
+                        type: string
+                        example: "Cryptography"
+                     "Challenges":
+                        type: array
+                        items:
+                           type: object
+                           properties:
+                              "problemName":
+                                 type: string
+                                 example: "Caesar Cipher"
+                              "point":
+                                 type: "integer"
+                                 format: "int32"
+                                 example: 100
+            TimeRemaining:
+               type: string
+               example: 03:00:00
+      ProblemDetails: 
+         type: object
+         properties:
+            problemName:
+               type: string
+               example: "Caesar Cipher"
+            point:
+               type: "integer"
+               format: "int32"
+               example: 100
+            description:
+               type: string
+               example: "Caesar cipher is one of the simplest and most widely known encryption techniques. 
+                        It is a type of substitution cipher in which each letter in the plaintext is 
+                        replaced by a letter some fixed number of positions down the alphabet. 
+                        For example, with a left shift of 3, D would be replaced by A, E would become B, 
+                        and so on. The method is named after Julius Caesar, who used it in his private 
+                        correspondence."
+            FileLink:
+               type: array
+               items:
+                  type: string
+                  example: "https://drive.pyctf.live/0:/CaesarCipher.py"
+            Author:
+               type: string
+               example: "Hunt3r"
+            Flag demo:
+               type: string
+               example: "ctfe{test}"
+            number of attempts:
+               type: "integer"
+               format: "int32"
+               example: 5
+            number of solvers:
+               description: "number of teams who solved this problem"
+               type: "integer"
+               format: "int32"
+               example: 1
+            solvers:
+               type: array
+               items:
+                  type: object
+                  properties:
+                     teamname:
+                        type: string
+                        example: "Potato Hackers"
+                     time:
+                        type: string
+                        example: November 13, 2023 8:40 PM
+                  example: "Potato Hackers"
+            number of hints:
+               type: "integer"
+               format: "int32"
+               example: 1
+            hints:
+               type: array
+               items:
+                  type: object
+                  properties:
+                     hint number:
+                        type: "integer"
+                        format: "int32"
+                        example: 1
+                     available:
+                        type: "boolean"
+                        description: "hint is available without loosing points or not"
+                        example: true
+                     hint:
+                        type: string
+                        example: "you can use burp suite"
+                        description: "this is optional if available is false"
+                        optional: true
+                     pointLost:
+                        type: "integer"
+                        format: "int32"
+                        example: 0
+      Standings:
+         type: array
+         items:
+            type: object   
+            properties:
+               rank:
+                  type: "integer"
+                  format: "int32"
+                  example: 1
+               teamname:
+                  type: string
+                  example: "Potato Hackers"
+               score:
+                  type: "integer"
+                  format: "int32"
+                  example: 1200
+               number of solved problems:
+                  type: "integer"
+                  format: "int32"
+                  example: 5
+      
+      Clarifications:
+         type: array
+         items:
+            type: object
+            properties:
+               question:
+                  type: string
+                  example: "i think there is a missing information in the ques?"
+               answer:
+                  type: string
+                  example: "yes, you are right"
+               catagory:
+                  type: string
+                  example: "Cryptography"
+               time:
+                  type: string
+                  example: November 13, 2023 8:40 PM
+               teamname:
+                  type: string
+                  example: "Potato Hackers"
+               status:
+                  type: string
+                  example: "answered"
+      Announcements:
+         type: array
+         items:
+            type: object
+            properties:
+               announcement:
+                  type: string
+                  example: "Contest time has been extended by 1 hour"
+               time:
+                  type: string
+                  example: November 13, 2023 6:40 PM
+      TeamPerformanceOfAContest:
+         type: object
+         properties:
+            teamname:
+               type: string
+               example: "Potato Hackers"
+            rank:
+               type: "integer"
+               format: "int32"
+               example: 7
+            score:
+               type: "integer"
+               format: "int32"
+               example: 1200
+            number of solved problems:
+               type: "integer"
+               format: "int32"
+               example: 5
+            Attempt Statistics:
+               type: object
+               properties:
+                  solves: 
+                     type: string
+                     example: 21.95%
+                  Fails:
+                     type: string
+                     example: 78.05%
+            teamMembers:
+               type: array
+               items:
+                  ref: '#/components/schemas/UserPerformanceOfAContest'
+            solves:
+               type: array
+               items:
+                  type: object
+                  properties:
+                     problemName:
+                        type: string
+                        example: "Caesar Cipher"
+                     catagory:
+                        type: string
+                        example: "Cryptography"
+                     point:
+                        type: "integer"
+                        format: "int32"
+                        example: 100
+                     time:
+                        type: string
+                        example: November 13, 2023 8:40 PM
+      UserPerformanceOfAContest:
+         type: object
+         properties:
+            username:
+               type: string
+               example: "Zero66"
+            point:
+               type: "integer"
+               format: "int32"
+               example: 800
+            number of solved problems:
+               type: "integer"
+               format: "int32"
+               example: 3
+            Attempt Statistics:
+               type: object
+               properties:
+                  solves: 
+                     type: string
+                     example: 21.95%
+                  Fails:
+                     type: string
+                     example: 78.05%
+            solves:
+               type: array
+               items:
+                  type: object
+                  properties:
+                     problemName:
+                        type: string
+                        example: "Caesar Cipher"
+                     catagory:
+                        type: string
+                        example: "Cryptography"
+                     point:
+                        type: "integer"
+                        format: "int32"
+                        example: 100
+                     time:
+                        type: string
+                        example: November 13, 2023 8:40 PM
+      

@@ -1,0 +1,344 @@
+
+tags:
+- name: Problems
+
+
+paths:
+  /problems:
+    get:
+      tags:
+      - "Problems"
+      summary: "Get all problems"
+      description: "Get all problems"
+      operationId: "getProblems"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "filter"
+        in: "query"
+        description: "filter problem by catagory: web, crypto, pwn, reverse, misc, forensics etc"
+        required: true
+        type: "string"
+        collectionFormat: "multi"
+      - name: "Search_text"
+        in: "query"
+        description: "search problem by name"
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Problem'
+  /problems/{problemId}/Description:
+    get:
+      tags:
+      - "Problems"
+      summary: "Get problem by problemId"
+      description: "Get problem by problemId"
+      operationId: "getProblemById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "problemId"
+        in: "path"
+        description: "problemId of the problem to get"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                      example: crypto
+                  ProblemDetails:
+                    $ref: '#components/schemas/ProblemDetails'    
+                  WriteupLink:
+                    type: string
+                    example: "iCTF WRITEUPS"
+        400:
+          description: "Invalid problemId supplied"
+        404:
+          description: "Problem not found"
+  /problems/{problemId}/SubmitFlag:
+    post:
+      tags:
+      - "Problems"
+      summary: "Submit flag for a problem"
+      description: "Submit flag for a problem"
+      operationId: "submitFlag"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "problemId"
+        in: "path"
+        description: "problemId of the problem to get"
+        required: true
+        type: "string"
+      - name: "flag"
+        in: "body"
+        description: "flag to submit"
+        required: true
+        type: "string"
+        example: "flag{this_is_a_flag}"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verdict:
+                    type: string
+                    example: correct
+        400:
+          description: "Invalid problemId supplied"
+        404:
+          description: "Problem not found"
+  /problems/{problemId}/Discussion:
+    get:
+      tags:
+      - "Problems"
+      summary: "Get discussion for a problem"
+      description: "Get discussion for a problem"
+      operationId: "getDiscussion"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "problemId"
+        in: "path"
+        description: "problemId of the problem to get"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Comment'
+        400:
+          description: "Invalid problemId supplied"
+        404:
+          description: "Problem not found"
+  /problems/{problemId}/Discussion/comment:
+    post:
+      tags:
+      - "Problems"
+      summary: "Comment on a discussion"
+      description: "Comment on a discussion"
+      operationId: "commentOnDiscussion"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "problemId"
+        in: "path"
+        description: "problemId of the problem to get"
+        required: true
+        type: "string"
+      - name: "comment"
+        in: "body"
+        description: "comment to post"
+        required: true
+        type: "object"
+        properties:
+          commentbody:
+            type: string
+            example: "this is a comment"
+          Attachment:
+            type: string
+            example: "https://www.google.com"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  commentId:
+                    type: string
+                    example: 123456
+        400:
+          description: "Invalid problemId supplied"
+        404:
+          description: "Problem not found"
+  /problems/{problemId}/Discussion/comment/{commentId}:
+    delete:
+      tags:
+      - "Problems"
+      summary: "Delete a comment"
+      description: "Delete a comment"
+      operationId: "deleteComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "problemId"
+        in: "path"
+        description: "problemId of the problem to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to delete"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+        400:
+          description: "Invalid commentId or problemId supplied"
+        404:
+          description: "Problem not found"
+    put:
+      tags:
+      - "Problems"
+      summary: "Edit a comment"
+      description: "Edit a comment"
+      operationId: "editComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "problemId"
+        in: "path"
+        description: "problemId of the problem to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to edit"
+        required: true
+        type: "string"
+      - name: "comment"
+        in: "body"
+        description: "comment to post"
+        required: true
+        type: "object"
+        properties:
+          commentbody:
+            type: string
+            example: "this is a comment"
+          Attachment:
+            type: string
+            example: "https://www.google.com"
+      responses:
+        200:
+          description: "successful"
+        400:
+          description: "Invalid commentId or problemId supplied"
+        404:
+          description: "Problem not found"
+  /problems/{problemId}/Discussion/comment/{commentId}/reply:
+    post:
+      tags:
+      - "Problems"
+      summary: "Reply on a comment"
+      description: "Reply on a comment"
+      operationId: "replyOnComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "problemId"
+        in: "path"
+        description: "problemId of the problem to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to reply"
+        required: true
+        type: "string"
+      - name: "reply"
+        in: "body"
+        description: "reply to post"
+        required: true
+        type: "object"
+        properties:
+          commentbody:
+            type: string
+            example: "this is a reply"
+          Attachment:
+            type: string
+            example: "https://www.google.com"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  replyId:
+                    type: string
+                    example: 123456
+        400:
+          description: "Invalid commentId or problemId supplied"
+        404:
+          description: "Problem not found"
+
+
+components:
+  schemas: 
+    Problem:
+      type: object
+      properties:
+          problemId:
+              type: string
+              description: problemId of the problem
+              example: EASY RSA
+          catagory:
+              type: string
+              description: catagory of the problem
+              example: crypto
+          contest:   
+            type: string
+            description: in which contest this problem appeared on
+            example: ANTARJAL2023
+          date:
+            type: string
+            description: date when the problem was published or the contest hold
+            example: 18 DEC, 2023
+    Comment:
+      type: object
+      properties:
+          username:
+              type: string
+              description: username of the user who Commented on the discussion forum
+              example: lara
+          commentbody:
+              type: string
+              description: comment posted by the user
+              example: "this is a comment"
+          Attachment:
+              type: string
+              description: attachment link or any image 
+              example: "https://www.google.com"
+          likes:
+              type: integer
+              description: number of likes on the comment
+              example: 10
+          replyCount:
+              type: integer
+              description: number of replies on the comment
+              example: 2
+          reply: 
+              type: array
+              items:
+                $ref: '#components/schemas/Comment'
+          date:
+              type: string
+              description: date when the comment was posted
+              example: 18 DEC, 2023

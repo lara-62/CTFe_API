@@ -27,8 +27,99 @@
              description: "Invalid username supplied"
             404:
              description: "User not found"
-
-
+   /users/contests/{username}:
+     get:
+        tags:
+        - "Users"
+        summary: "Get all the contest this user participated in"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "username"
+          in: "path"
+          description: "unique username of the user to get"
+          required: true
+          type: "string"
+        - name: "type"
+          in: "query"
+          description: "type of the contest"
+          type: "array"
+          content:
+               text/plain:
+                  schema:
+                    type: "array"
+                    items:
+                       type: "string"
+                       enum:
+                       - "all"
+                       - "private"
+                       - "offcial"
+                       - "participated"
+                       - "organized"
+                       default: "all"
+          collectionFormat: "multi"
+        responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         $ref: '#/components/schemas/User'
+            400:
+             description: "Invalid username supplied"
+            404:
+             description: "User not found"
+   /users/SolvedProblems/{username}:
+     get:
+        tags:
+        - "Users"
+        summary: "Get all the problems this user solved or tried"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "username"
+          in: "path"
+          description: "unique username of the user to get"
+          required: true
+          type: "string"
+        - name: "type"
+          in: "query"
+          description: "type of the problem"
+          type: "array"
+          content:
+               text/plain:
+                  schema:
+                    type: "array"
+                    items:
+                       type: "string"
+                       enum:
+                       - "all"
+                       - "solved"
+                       - "tried"
+                       default: "all"
+          collectionFormat: "multi"
+        - name: "tags"
+          in: "query"
+          type: "string"
+          description: "tags of the problem"
+          collectionFormat: "multi"
+          optional: true
+        - name: "search_text"
+          in: "query"
+          type: "string"
+          description: "search the problem "
+          optional: true
+        responses:
+            200:
+              description: "successful"
+              content:
+                 application/json:
+                      schema:
+                         $ref: '#/components/schemas/User'
+            400:
+             description: "Invalid username supplied"
+            404:
+             description: "User not found"
   components:
    schemas:
       User:
@@ -69,22 +160,4 @@
            Global standing:
                type: Integer
                example: 12
-      Problem:
-         type: object
-         required:
-         - title
-         properties:
-              title:
-                 type: string
-                 description: title for the problem
-                 example: find the flag
-              description:
-                 type: string
-                 description: description for the problem 
-              contest:   
-                type: string
-                description: in which contest this problem appeared on
-              date:
-                type: string
-                description: date when the problem was published or the contest hold
- 
+     

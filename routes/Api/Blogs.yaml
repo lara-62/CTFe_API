@@ -1,0 +1,498 @@
+
+tags:
+ - name: "Blogs"
+   description: "Blogs"
+
+
+paths:
+  /blogs:
+    get:
+      tags:
+      - "Blogs"
+      summary: "Get all blogs of all users"
+      description: "Get all blogs"
+      operationId: "getBlogs"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "filter"
+        in: "query"
+        description: "filter blogs by catagory: web, crypto, pwn, reverse, misc, forensics etc"
+        type: "string"
+        collectionFormat: "multi"
+      - name: "Search_text"
+        in: "query"
+        description: "search blogs by name"
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Blog'
+  /blogs/{blogId}:
+    get:
+      tags:
+      - "Blogs"
+      summary: "Get a specific blog by blogId"
+      description: "Get specific blog by blogId"
+      operationId: "getBlogById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to get"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/BlogDetails'
+    put:
+      tags:
+      - "Blogs"
+      summary: "Update a blog"
+      description: "Update a blog"
+      operationId: "updateBlog"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to update"
+        required: true
+        type: "string"
+      - name: "blog"
+        in: "body"
+        description: "blog to update"
+        required: true
+        type: "object"
+        schema:
+          $ref: '#components/schemas/Blogbody'
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blogId:
+                    type: string
+                    example: 123456
+        400:
+          description: "Invalid blog supplied"
+        401:
+          description: "User not authorized to this blog"
+        404:
+          description: "blogId not found"
+
+    delete:
+      tags:
+      - "Blogs"
+      summary: "Delete a blog"
+      description: "Delete a blog"
+      operationId: "deleteBlog"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username of the user to delete blog"
+        required: true
+        type: "string"
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to delete"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blogId:
+                    type: string
+                    example: 123456
+        400:
+          description: "Invalid blog supplied"
+        401:
+          description: "User not authorized to this blog"
+        404:
+          description: "blogId not found"
+
+
+  /blogs/{blogId}/comment:
+    post:
+      tags:
+      - "Blogs"
+      summary: "comment on a blog"
+      description: "make a comment on a blog"
+      operationId: "addComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to get"
+        required: true
+        type: "string"
+      - name: "comment"
+        in: "body"
+        description: "comment to add"
+        required: true
+        schema:
+          type: object
+          properties:
+            commentbody:
+              type: string
+              example: "This is a comment"
+            attachment:
+              type: string
+              example: "some links"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Comment'
+  /blogs/{blogId}/{commentId}:
+    put:
+      tags:
+      - "Blogs"
+      summary: "update a comment"
+      description: "update a comment"
+      operationId: "updateComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to update"
+        required: true
+        type: "string"
+      - name: "comment"
+        in: "body"
+        description: "comment to update"
+        required: true
+        schema:
+          type: object
+          properties:
+            commentbody:
+              type: string
+              example: "This is a comment"
+            attachment:
+              type: string
+              example: "some links"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Comment'
+        401:
+          description: "User not authorized to this comment"
+    delete:
+      tags:
+      - "Blogs"
+      summary: "delete a comment"
+      description: "delete a comment"
+      operationId: "deleteComment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to delete"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Comment'
+        401:
+          description: "User not authorized to this comment"
+  /blogs/{blogId}/{commentId}/reply:
+    post:
+      tags:
+      - "Blogs"
+      summary: "reply to a comment"
+      description: "reply to a comment"
+      operationId: "addReply"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to reply"
+        required: true
+        type: "string"
+      - name: "reply"
+        in: "body"
+        description: "reply to add"
+        required: true
+        schema:
+          type: object
+          properties:
+            replybody:
+              type: string
+              example: "This is a reply"
+            attachment:
+              type: string
+              example: "some links"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                properties:
+                  replyId:
+                    type: string
+                    example: 123456
+  /blogs/{blogId}/{commendId}/{replyId} :
+    put:
+      tags: 
+      - "Blogs"
+      summary: "update a reply"
+      description: "update a reply"
+      operationId: "updateReply"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to reply"
+        required: true
+        type: "string"
+      - name: "replyId"
+        in: "path"
+        description: "replyId of the reply to update"
+        required: true
+        type: "string"
+      - name: "reply"
+        in: "body"
+        description: "reply to update"
+        required: true
+        schema:
+          type: object
+          properties:
+            replybody:
+              type: string
+              example: "This is a reply"
+            attachment:
+              type: string
+              example: "some links"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                properties:
+                  replyId:
+                    type: string
+                    example: 123456
+        401:
+          description: "User not authorized to this reply"
+    delete:
+      tags:
+      - "Blogs"
+      summary: "delete a reply"
+      description: "delete a reply"
+      operationId: "deleteReply"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blogId"
+        in: "path"
+        description: "blogId of the blog to get"
+        required: true
+        type: "string"
+      - name: "commentId"
+        in: "path"
+        description: "commentId of the comment to reply"
+        required: true
+        type: "string"
+      - name: "replyId"
+        in: "path"
+        description: "replyId of the reply to delete"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                properties:
+                  replyId:
+                    type: string
+                    example: 123456
+        401:
+          description: "User not authorized to this reply"   
+
+  /blogs/{username}:
+    get:
+      tags:
+      - "Blogs"
+      summary: "Get all the blogs of a user"
+      description: "Get all the blogs of a user"
+      operationId: "getBlogsByUsername"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username of the user to get blogs"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Blog'
+
+
+  /blogs/createblog:
+    post:
+      tags:
+      - "Blogs"
+      summary: "Create a blog"
+      description: "Create a blog"
+      operationId: "createBlog"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "blog"
+        in: "body"
+        description: "blog to create"
+        required: true
+        type: "object"
+        schema:
+          $ref: '#components/schemas/Blogbody'
+      responses:
+        200:
+          description: "successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blogId:
+                    type: string
+                    example: 123456
+        400:
+          description: "Invalid blog supplied"
+
+
+  
+
+
+components:
+  schemas:
+      Blog:
+        type: object
+        properties:
+          blogName:
+            type: string
+            example: WRITE UP FOR CAKECTF 2023
+          Date :
+            type: string
+            example: Dec 12, 2023
+          username :
+            type: string
+            example: 0xRobiuL
+          tags:
+            type: array
+            items:
+              type: string
+              example: forensics
+          summary:
+            type: string
+            example: Attention hackers, Write ups for this year’s CAKECTF has been published.
+      
+      BlogDetails:
+          type: object
+          properties:
+            blogName:
+              type: string
+              example: WRITE UP FOR CAKECTF 2023
+            Date :
+              type: string
+              example: Dec 12, 2023
+            username :
+              type: string
+              example: 0xRobiuL
+            tags:
+              type: array
+              items:
+                type: string
+                example: forensics
+            content:
+              type: object
+              example: {
+                description: "Last week,We got together to play CAKECTF for the second time as a team. We solved 26/29 of the challenges during the 24 hour window and came third overall. First and second places went to Super Guessers (Rkm and Rbtree are very friendly faces from CryptoHack) and a Vietnamese team working together to support the spirit of Ho Chi Minh city and nearby provinces." ,
+                Attachment: "some links"
+              }
+            comments:
+              type: array
+              items:
+                $ref: '#components/schemas/Comment'
+
+      Blogbody:
+        type : object
+        properties:
+          blogName:
+            type: string
+            example: WRITE UP FOR CAKECTF 2023
+          tags:
+            type: array
+            items:
+              type: string
+              example: crypto
+          content:
+            type: object
+            example: {
+              description: "Last week,We got together to play CAKECTF for the second time as a team. We solved 26/29 of the challenges during the 24 hour window and came third overall. First and second places went to Super Guessers (Rkm and Rbtree are very friendly faces from CryptoHack) and a Vietnamese team working together to support the spirit of Ho Chi Minh city and nearby provinces." ,
+              Attachment: "some links"
+            }
