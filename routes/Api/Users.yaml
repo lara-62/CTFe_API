@@ -64,7 +64,7 @@
               content:
                  application/json:
                       schema:
-                         $ref: '#/components/schemas/User'
+                         $ref: '#/components/schemas/UserContest'
             400:
              description: "Invalid username supplied"
             404:
@@ -115,7 +115,7 @@
               content:
                  application/json:
                       schema:
-                         $ref: '#/components/schemas/User'
+                         $ref: '#/components/schemas/UserSolvedProblems'
             400:
              description: "Invalid username supplied"
             404:
@@ -160,4 +160,65 @@
            Global standing:
                type: Integer
                example: 12
-     
+      UserContest: 
+        type: array
+        items:
+           type: object
+           required:
+            - contest_id
+            - contest_name
+            - contest_date
+            - rank
+            - solved
+           properties:
+            contest_id:
+               type: string
+               description: contest id
+               example: 1234
+            contest_name:
+               type: string
+               description: contest name
+               example:  Round #1234
+            contest_date:
+               type: string
+               description: contest date
+               example: 2021-01-01
+            rank:
+               type: Integer
+               description: rank of the user
+               example: 12
+            solved:
+               type: Integer
+               description: number of solved problems
+               example: 12
+      UserSolvedProblems:
+        type: array
+        items:
+           type: object
+           required:
+            - problem_id
+            - problem_name
+            - problem_solved_date
+            - problem_tags
+            - contest_name
+           properties:
+            problem_id:
+               type: string
+               description: problem id
+               example: 1234
+            problem_name:
+               type: string
+               description: problem name
+               example: A. Boring Apartments
+            problem_tags:
+               type: array
+               description: problem tags
+               example: [crypro]
+            contest_name:
+               type: string
+               description: contest name
+               example: Round #1234
+            problem_solved_date:
+               type: string
+               description: problem solved date
+               example: 2021-01-01
